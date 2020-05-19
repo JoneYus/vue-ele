@@ -38,8 +38,23 @@
             <span slot="label">
               <i class="el-icon-user"></i>好友列表
             </span>
+
             <div class="listDetail">
               <ul>
+                <li>
+                  <el-button type="text" @click="dialogFormVisible = true">搜索好友添加</el-button>
+                  <el-dialog title="搜索用户" :visible.sync="dialogFormVisible">
+                    <el-form :model="form">
+                      <el-form-item label="用户昵称" :label-width="formLabelWidth">
+                        <el-input v-model="form.name" autocomplete="off"></el-input>
+                      </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                      <el-button @click="dialogFormVisible = false">取 消</el-button>
+                      <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                    </div>
+                  </el-dialog>
+                </li>
                 <li>
                   <i class="el-icon-user-solid"></i> are daling
                 </li>
@@ -67,7 +82,20 @@ export default {
     return {
       circleUrl:
         "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-      count: 0
+      count: 0,
+
+      dialogTableVisible: false,
+        dialogFormVisible: false,
+        form: {
+          name: '',
+          date1: '',
+          date2: '',
+          delivery: false,
+          type: [],
+          resource: '',
+          desc: ''
+        },
+        formLabelWidth: '120px'
     };
   },
   methods: {
@@ -77,9 +105,9 @@ export default {
     load() {
       this.count += 2;
     },
-    logout(){
-      alert('退出登录成功')
-      this.$router.push('login')
+    logout() {
+      alert("退出登录成功");
+      this.$router.push("login");
     }
   }
 };
