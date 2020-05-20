@@ -9,14 +9,14 @@
           </el-button>
         </div>
 
-        <div class="demo-input-suffix rowLine">
+        <div class="demo-input-suffix ">
           <span>账号:</span>
-          <el-input v-model="input" placeholder="请输入新用户名"></el-input>
+          <el-input v-model="username" placeholder="请输入新用户名" clearable></el-input>
         </div>
         <br><br>
-        <div class="demo-input-suffix rowLine">
+        <div class="demo-input-suffix ">
           密码:
-          <el-input v-model="input" placeholder="请输入新用户密码"></el-input>
+          <el-input v-model="pwd" placeholder="请输入新用户密码" clearable></el-input>
         </div>
         <br><br>
         <el-button type="primary" round id="registerBtn" @click="register">注册</el-button>
@@ -29,7 +29,10 @@
 export default {
   props: {},
   data() {
-    return {};
+    return {
+      username:'',
+      pwd:''
+    };
   },
   watch: {},
   methods: {
@@ -41,16 +44,8 @@ export default {
 };
 </script>
 <style scoped>
-#registerBtn{
-    /* margin-left: 74px; */
-}
-.rowLine {
-  display: inline-flex;
-  flex-direction: row;
-  justify-items: right;
-}
-.rowLine span{
-    direction: ltr;
+.el-input{
+  width: 80%;
 }
 * {
   margin: 0;

@@ -9,19 +9,20 @@
           </el-button>
         </div>
 
-        <div class="demo-input-suffix rowLine">
-          <span>账号:</span>
-          <el-input v-model="username" placeholder="请输入用户名"></el-input>
+        <div class="demo-input ">
+          账号:
+          <el-input v-model="username" placeholder="请输入用户名" clearable></el-input>
         </div>
         <br><br>
-        <div class="demo-input-suffix rowLine">
+        <div class="demo-input-suffix">
           密码:
-          <el-input v-model="pwd" placeholder="请输入用户密码"></el-input>
+          <el-input v-model="pwd" placeholder="请输入用户密码" clearable  show-password></el-input>
         </div>
-        <br><br>
+
+        <br />
+        <br />
         <el-button type="primary" round id="loginBtn" @click="login">登录</el-button>
       </el-card>
-      
     </div>
   </div>
 </template>
@@ -30,27 +31,32 @@ export default {
   props: {},
   data() {
     return {
-      username:'',
-      pwd:''
+      username: "",
+      pwd: "",
+
+      dialogProfileVisible: false,
+      formProfileWidth: "120px",
+      profile: {
+        name: "simple",
+        nickname: "抓泥鳅的阿牛哥",
+        sign: "就是这么有个性的个性签名",
+        url:
+          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+      }
     };
   },
   watch: {},
   methods: {
-      login(){
-          alert("登录成功")
-          this.$router.push('/index')
-      }
+    login() {
+      alert("登录成功");
+      this.$router.push("/index");
+    }
   }
 };
 </script>
 <style scoped>
-.rowLine {
-  display: inline-flex;
-  flex-direction: row;
-  justify-items: right;
-}
-.rowLine span{
-    direction: ltr;
+.el-input{
+  width: 80%;
 }
 * {
   margin: 0;
@@ -59,23 +65,22 @@ export default {
 a {
   text-decoration: none;
 }
-.clearfix:before,
+/* .clearfix:before,
 .clearfix:after {
   display: table;
   content: "";
 }
 .clearfix:after {
   clear: both;
-}
+} */
 
 .box-card {
   width: 280px;
 }
 .main {
   display: flex;
-  direction: ltr;
   justify-content: center;
-  justify-items: center;
+  justify-items: left;
   padding-top: 10%;
 }
 </style>
