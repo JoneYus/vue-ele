@@ -34,7 +34,7 @@ export default {
   props: {},
   data() {
     return {
-      appkey: '45c6af3c98409b18a84451215d0bdd6e',
+      appkey: "45c6af3c98409b18a84451215d0bdd6e",
       account: "",
       pwd: "",
       nim: null,
@@ -98,11 +98,15 @@ export default {
       console.log(error);
     },
     login() {
+      // console.log(this.$store.state.NIM.getInstance())
       console.log(this.appkey+"==>"+this.account+"==>"+MD5(this.pwd))
-      this.nim = this.$store.state.NIM.getInstance({
+      this.nim=this.$store.state.NIM.getInstance({
         appkey: this.appkey,
         account: this.account,
         token: MD5(this.pwd),
+        // appKey:"45c6af3c98409b18a84451215d0bdd6e",
+        // account:"simple1",
+        // token:MD5("simple"),
         db: false, //若不要开启数据库请设置false。SDK默认为true。
         // privateConf: {}, // 私有化部署方案所需的配置
         onconnect:function(obj){
@@ -111,10 +115,15 @@ export default {
         onwillreconnect: function(obj){
           console.log("SDK即将重新连接")
         },
-        ondisconnect: this.onDisconnect,
-        onerror: this.onError,
+        ondisconnect:function(obj){
+          console.log("SDK断开连接")
+        },
+        onerror: function(obj){
+          console.log("SDK连接错误")
+        },
       });
-      
+      this.$store.commit('setNim',this.nim);
+      console.log(this.$store.state.nim)
       this.$router.push("/index");
     },
    
@@ -122,7 +131,7 @@ export default {
    mounted(){
      var that = this
      this.showInit()
-    // console.log(MD5("234"))
+    // console.log("===>"+this.$store.state.NIM.getInstance({}))
   },
 };
 </script>

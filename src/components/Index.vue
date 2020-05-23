@@ -168,7 +168,11 @@ export default {
       this.count += 2;
     },
     logout() {
+      this.$store.state.nim.disconnect()
+      this.$store.commit('removeNim')
       alert("退出登录成功");
+      console.log(this.$store.state.nim)
+
       this.$router.push("login");
     }
   }
