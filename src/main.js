@@ -9,6 +9,7 @@ Vue.use(ElementUI)
 
 import router from './router/index'
 import store from './store/store.js'
+import axios from 'axios'
 
 new Vue({
   render: h => h(App),
@@ -20,10 +21,4 @@ new Vue({
   },
 }).$mount('#app')
 
-// import NIM from './SDK/NIM_Web_NIM_v7.6.0.js'
-// Vue.prototype.$SDK = NIM
-// console.log(this.$SDK)
-
-// import Utils from './utils/Utils.js'
-// Vue.use(Utils)
-// Vue.prototype.$Utils = Utils
+Vue.prototype.$axios = axios

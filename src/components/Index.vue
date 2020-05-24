@@ -169,12 +169,20 @@ export default {
     },
     logout() {
       this.$store.state.nim.disconnect()
-      this.$store.commit('removeNim')
       alert("退出登录成功");
       console.log(this.$store.state.nim)
 
       this.$router.push("login");
+    },
+     checkNim(){
+       if(this.$store.state.nim==null){
+         this.$router.push('login')
+       }
+      console.log("checkNim is running ... ")
     }
+  },
+  mounted(){
+   this.checkNim()
   }
 };
 </script>

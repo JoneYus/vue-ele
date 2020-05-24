@@ -34,7 +34,7 @@ export default {
   props: {},
   data() {
     return {
-      appkey: "45c6af3c98409b18a84451215d0bdd6e",
+      appKey: "45c6af3c98409b18a84451215d0bdd6e",
       account: "",
       pwd: "",
       nim: null,
@@ -53,17 +53,6 @@ export default {
   watch: {},
   methods: {
     showInit(){
-      console.log(this.$store.state.count)
-      // console.log(this.$store.state.NIM.getInstance({
-      //   appKey: this.appkey,
-      //   account: this.account,
-      //   // token: MD5(this.pwd),
-      //   onconnect: function() {
-      //     console.log("SDK 连接成功");
-      //     // 连接成功后才能发消息
-      //   },
-      // }))
-      // console.log(this.$store.state.Utils)
     },
      onConnect() {
       console.log("连接成功");
@@ -99,14 +88,11 @@ export default {
     },
     login() {
       // console.log(this.$store.state.NIM.getInstance())
-      console.log(this.appkey+"==>"+this.account+"==>"+MD5(this.pwd))
+      console.log(this.appKey+"==>"+this.account+"==>"+MD5(this.pwd))
       this.nim=this.$store.state.NIM.getInstance({
-        appkey: this.appkey,
+        appKey: this.appKey,
         account: this.account,
         token: MD5(this.pwd),
-        // appKey:"45c6af3c98409b18a84451215d0bdd6e",
-        // account:"simple1",
-        // token:MD5("simple"),
         db: false, //若不要开启数据库请设置false。SDK默认为true。
         // privateConf: {}, // 私有化部署方案所需的配置
         onconnect:function(obj){
@@ -115,8 +101,11 @@ export default {
         onwillreconnect: function(obj){
           console.log("SDK即将重新连接")
         },
-        ondisconnect:function(obj){
-          console.log("SDK断开连接")
+        ondisconnect:(obj)=>{
+          console.log("SDK快要断开连接"+this.$store.state.nim)
+
+          this.$store.commit('removeNim')
+          console.log("SDK断开连接"+this.$store.state.nim)
         },
         onerror: function(obj){
           console.log("SDK连接错误")
@@ -124,6 +113,12 @@ export default {
       });
       this.$store.commit('setNim',this.nim);
       console.log(this.$store.state.nim)
+      // 登录成功消息提示
+      //  this.$message({
+      //     showClose: true,
+      //     message: '恭喜你，这是一条成功消息',
+      //     type: 'success'
+      //   });
       this.$router.push("/index");
     },
    
