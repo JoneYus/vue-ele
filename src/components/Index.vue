@@ -97,10 +97,6 @@
                     <div class="friendAvator" :style="backgroundImg(friend.url)" style="background-image:url(++"></div>
                     <div class="friendName">{{friend.name}}</div>
                   </div>
-                  <!-- <div class="friendList">
-                    <div class="friendAvator" :style="backgroundImg"></div>
-                    <div class="friendName">huahua</div>
-                  </div> -->
                 </li>
               </ul>
             </div>

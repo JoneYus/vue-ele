@@ -16,7 +16,7 @@
         <br />
         <div class="demo-input-suffix">
           密码:
-          <el-input v-model="pwd" placeholder="请输入新用户密码" clearable></el-input>
+          <el-input v-model="pwd" placeholder="请输入新用户密码" show-password clearable></el-input>
         </div>
         <br />
         <div class="demo-input-suffix">
@@ -31,6 +31,8 @@
   </div>
 </template>
 <script>
+import { MD5 } from "../utils/Utils.js";
+
 export default {
   props: {},
   data() {
@@ -44,30 +46,42 @@ export default {
   methods: {
     async fetchSomething() {
       const ip = await this.$axios.get("http://icanhazip.com");
-      console.log(ip)
+      console.log(ip);
     },
     async register() {
       var params = {
         username: this.username,
-        password: this.pwd,
+        password: MD5(this.pwd),
         nickname: this.nickname
-      }
-      this.$axios.defaults.headers.common["appKey"] = '45c6af3c98409b18a84451215d0bdd6e';
-      this.$axios.defaults.headers.common["appKContent-Typeey"] = 'application/x-www-form-urlencoded';
-      this.$axios.post('https://app.netease.im/api/createDemoUser',params,
-      // {headers,
-      // {'Content-Type': 'application/x-www-form-urlencoded',
-        // 'appKey':'45c6af3c98409b18a84451215d0bdd6e'
-      // }
-      // }
-      ).then((response)=>{
-        console.log(response)
-        alert("注册成功");
-        this.$router.push("login");
-      }).catch((error)=>{
-        console.log("ERROR"+error)
-        alert("注册失败");
-      });
+      };
+      this.$axios.defaults.headers.common["appkey"] =
+        "45c6af3c98409b18a84451215d0bdd6e";
+      this.$axios.defaults.headers.common["Content-Type"] =
+        "application/x-www-form-urlencoded";
+      await this.$axios
+        .post(
+          "https://app.netease.im/api/createDemoUser",
+          params
+          // {headers,
+          // {'Content-Type': 'application/x-www-form-urlencoded',
+          // 'appKey':'45c6af3c98409b18a84451215d0bdd6e'
+          // }
+          // }
+        )
+        .then(response => {
+          if (response.res == 200) {
+            console.log(response);
+            alert("注册成功");
+            this.$router.push("login");
+          } else {
+            alert("虽然跑通,但结果却不是200");
+            console.log(response.data.errmsg);
+          }
+        })
+        .catch(error => {
+          console.log("ERROR" + error.errmsg);
+          alert("注册失败");
+        });
       //   contentType: "application/x-www-form-urlencoded",
       //   beforeSend: function(req) {
       //     req.setRequestHeader("appkey", "45c6af3c98409b18a84451215d0bdd6e");

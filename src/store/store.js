@@ -15,7 +15,8 @@ const store = new Vuex.Store({
     state: {
         NIM:null,
         MD5:null,
-        nim:null
+        nim:null,
+        data:null
     },
     mutations: {
         initNIM(state){
@@ -27,13 +28,20 @@ const store = new Vuex.Store({
             console.log("initMD5 has been execute")
             state.MD5 = MD5
         },
+        setDate(state){
+            this.data =  123
+        },
+        removeDate(state){
+            state.data = null
+        },
         setNim(state,nim){
             state.nim = nim;
             console.log("setNim successful ==>"+state.nim)
             return state.nim
         },
         removeNim(state){
-            state.nim = null
+            state.data = null;
+            state.nim = null;
         },
     }
 })
