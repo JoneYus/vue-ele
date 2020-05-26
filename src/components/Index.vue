@@ -187,6 +187,7 @@ export default {
       alert("修改用户信息");
     },
     logout() {
+      this.$cookies.remove('isLogin')
       this.$store.state.nim.disconnect();
       alert("退出登录成功");
       console.log(this.$store.state.nim);
@@ -204,11 +205,26 @@ export default {
     },
     heartBeatTest(){
       console.log("setinterval"+this.load())
+    },
+    getUsersDone(error,users){
+      console.log(error);
+      console.log(users);
+      console.log('获取用户资料数组' + (!error?'成功':'失败'));
     }
   },
   mounted() {
     this.timer=setInterval(this.heartBeatTest, 2000);
+    console.log(this.$store.state.data)
     this.checkNim();
+    var friList = this.$store.state.data.friends;
+    var accounts = []
+    for(var i = 1;i<friList.size;i++){
+      accounts.append(friList[i].account)
+    }
+    this.$store.state.nim.getUsers({
+      accounts:accounts,
+      done: this.getUsersDone
+    });
   },
   beforeDestroy(){
     clearInterval(this.timer)

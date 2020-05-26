@@ -143,15 +143,9 @@ export default {
     onFriends(friends) {
       console.log("收到好友列表", friends);
       console.log(this.nim);
-      this.$store.state.data.friends = this.nim.mergeFriends(
-        this.data.friends,
-        friends
-      );
+      this.$store.state.data.friends = this.nim.mergeFriends(this.data.friends,friends);
       console.log(this.$store.state.data.friends);
-      this.data.friends = this.$store.state.nim.cutFriends(
-        this.data.friends,
-        friends.invalid
-      );
+      this.data.friends = this.$store.state.nim.cutFriends(this.data.friends,friends.invalid);
     }
   },
   mounted() {
