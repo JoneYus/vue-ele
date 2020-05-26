@@ -93,8 +93,17 @@
                   </el-dialog>
                 </li>
                 <li>
-                  <div class="friendList"  v-for="friend in friendList" :key="friend.id">
-                    <div class="friendAvator" :style="backgroundImg(friend.url)" style="background-image:url(++"></div>
+                  <div
+                    class="friendList"
+                    v-for="friend in friendList"
+                    :key="friend.id"
+                    @click="openChat(friend.id)"
+                  >
+                    <div
+                      class="friendAvator"
+                      :style="backgroundImg(friend.url)"
+                      style="background-image:url(++"
+                    ></div>
                     <div class="friendName">{{friend.name}}</div>
                   </div>
                 </li>
@@ -124,12 +133,25 @@ export default {
         "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       count: 0,
 
-      
-
-      friendList:[
-        {id:1,name:'张小三',url:'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'},
-        {id:2,name:'Jack swon',url:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'},
-        {id:3,name:'恋郭的小喵',url:'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'},
+      friendList: [
+        {
+          id: 1,
+          name: "张小三",
+          url:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+        },
+        {
+          id: 2,
+          name: "Jack swon",
+          url:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+        },
+        {
+          id: 3,
+          name: "恋郭的小喵",
+          url:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+        }
       ],
       dialogProfileVisible: false,
       formProfileWidth: "120px",
@@ -150,41 +172,53 @@ export default {
         resource: "",
         desc: ""
       },
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      timer:null,
     };
   },
   methods: {
-    backgroundImg(url){
+    openChat(index){
+      alert("打开聊天页面"+index)
+    },
+    backgroundImg(url) {
       return "background-image:url(" + url + ");background-size: contain;";
     },
     editProfile() {
       alert("修改用户信息");
     },
-    load() {
-      this.count += 2;
-    },
     logout() {
-      this.$store.state.nim.disconnect()
+      this.$store.state.nim.disconnect();
       alert("退出登录成功");
-      console.log(this.$store.state.nim)
+      console.log(this.$store.state.nim);
 
       this.$router.push("login");
     },
-     checkNim(){
-       if(this.$store.state.nim==null){
-         this.$router.push('login')
-       }
-      console.log("checkNim is running ... ")
+    load(){
+      return this.count+=2
+    },
+    checkNim() {
+      if (this.$store.state.nim == null) {
+        this.$router.push("login");
+      }
+      console.log("checkNim is running ... ");
+    },
+    heartBeatTest(){
+      console.log("setinterval"+this.load())
     }
   },
-  mounted(){
-   this.checkNim()
+  mounted() {
+    this.timer=setInterval(this.heartBeatTest, 2000);
+    this.checkNim();
+  },
+  beforeDestroy(){
+    clearInterval(this.timer)
+    console.log("Clear interval")
   }
 };
 </script>
 
 <style scoped>
-.friendName{
+.friendName {
   position: absolute;
   font-size: 18px;
   margin: 20px 10px 20px 80px;

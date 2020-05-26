@@ -36,11 +36,11 @@
 <script>
 /* eslint-disable */
 import { MD5 } from "../utils/Utils.js";
+import nimConfig from '../config/nim-config.js'
 export default {
   props: {},
   data() {
     return {
-      appKey: "45c6af3c98409b18a84451215d0bdd6e",
       account: "",
       pwd: "",
       nim: null,
@@ -52,44 +52,86 @@ export default {
         sign: "就是这么有个性的个性签名",
         url:
           "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-      }
+      },
+      data: {},
     };
   },
   watch: {},
   methods: {
     onConnect() {
-       // console.log(this.$store.state.nim.account);
+      this.$store.commit("setNim", this.nim);
+      this.$cookies.set('isLogin',false)
       console.log("Special way to show SDK connect!!!");
+      console.log(this.$cookies.get('isLogin'))
+      console.log(nimConfig.appKey)
     },
     onDisconnect() {
       this.$store.commit("removeNim");
       console.log("SDK断开连接" + this.$store.state.nim);
     },
-    onFriends(friends){
-      console.log('收到好友列表', friends);
+
+    onSyncFriendAction(obj) {
+      console.log(obj);
+      switch (obj.type) {
+        case "addFriend":
+          console.log(
+            "你在其它端直接加了一个好友" + obj.account + ", 附言" + obj.ps
+          );
+          onAddFriend(obj.friend);
+          break;
+        case "applyFriend":
+          console.log(
+            "你在其它端申请加了一个好友" + obj.account + ", 附言" + obj.ps
+          );
+          break;
+        case "passFriendApply":
+          console.log(
+            "你在其它端通过了一个好友申请" + obj.account + ", 附言" + obj.ps
+          );
+          onAddFriend(obj.friend);
+          break;
+        case "rejectFriendApply":
+          console.log(
+            "你在其它端拒绝了一个好友申请" + obj.account + ", 附言" + obj.ps
+          );
+          break;
+        case "deleteFriend":
+          console.log("你在其它端删了一个好友" + obj.account);
+          onDeleteFriend(obj.account);
+          break;
+        case "updateFriend":
+          console.log("你在其它端更新了一个好友", obj.friend);
+          onUpdateFriend(obj.friend);
+          break;
+      }
     },
     login() {
-      // console.log(this.$store.state.NIM.getInstance())
-      console.log(this.appKey + "==>" + this.account + "==>" + MD5(this.pwd));
+      console.log(nimConfig.appKey + "==>" + this.account + "==>" + MD5(this.pwd));
       this.nim = this.$store.state.NIM.getInstance({
-        appKey: this.appKey,
+        appKey: nimConfig.appKey,
         account: this.account,
         token: MD5(this.pwd),
         db: false, //若不要开启数据库请设置false。SDK默认为true。
         // privateConf: {}, // 私有化部署方案所需的配置
         onconnect: this.onConnect(),
+        // 好友关系
+        onfriends: this.onFriends,
+        onmyinfo: this.onMyInfo,
+        onsyncfriendaction: this.onSyncFriendAction,
         onwillreconnect: function(obj) {
           console.log("SDK即将重新连接");
         },
         ondisconnect: obj => {
-          // console.log(this.$store.state.nim.account);
-          this.$store.state.nim.onFriends()
+          //
           this.$store.commit("removeNim");
           console.log("SDK断开连接" + this.$store.state.nim);
         },
-        onFriends:this.onFriends(),
         onerror: function(obj) {
           console.log("SDK连接错误");
+        },
+        onMyInfo(user) {
+          console.log("收到我的名片", user);
+          this.$store.state.data.myInfo = user;
         }
       });
       this.$store.commit("setNim", this.nim);
@@ -97,9 +139,27 @@ export default {
       console.log("===>");
       console.log(this.$store.state.data);
       this.$router.push("/index");
+    },
+    onFriends(friends) {
+      console.log("收到好友列表", friends);
+      console.log(this.nim);
+      this.$store.state.data.friends = this.nim.mergeFriends(
+        this.data.friends,
+        friends
+      );
+      console.log(this.$store.state.data.friends);
+      this.data.friends = this.$store.state.nim.cutFriends(
+        this.data.friends,
+        friends.invalid
+      );
     }
   },
-  mounted() {}
+  mounted() {
+  },
+  beforeDestroy() {
+    console.log("Before destroy....")
+    clearInterval(this.timer);
+  }
 };
 </script>
 <style scoped>
