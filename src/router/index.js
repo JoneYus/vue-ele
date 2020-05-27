@@ -9,6 +9,7 @@ import Index from '../components/Index.vue'
 import TEST from '../components/Test.vue'
 
 const routes = [
+  {path:'/',redirect:'/login'},
   { path: '/login', component: Login },
   { path: '/index', component: Index },
   { path: '/register', component: Register },

@@ -54,56 +54,25 @@ export default {
           "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
       },
       data: {},
+      errorMsg:"哎呀,出错啦"
     };
   },
   watch: {},
   methods: {
-    onConnect() {
+    onConnect(obj) {
       this.$store.commit("setNim", this.nim);
       this.$cookies.set('isLogin',false)
       console.log("Special way to show SDK connect!!!");
+      console.log(this.$store.state.nim)
       console.log(this.$cookies.get('isLogin'))
-      console.log(nimConfig.appKey)
+    },
+    onError(obj) {
+      console.log("SDK连接错误"+obj);
+      // alert("用户名或密码错误");
     },
     onDisconnect() {
       this.$store.commit("removeNim");
       console.log("SDK断开连接" + this.$store.state.nim);
-    },
-
-    onSyncFriendAction(obj) {
-      console.log(obj);
-      switch (obj.type) {
-        case "addFriend":
-          console.log(
-            "你在其它端直接加了一个好友" + obj.account + ", 附言" + obj.ps
-          );
-          onAddFriend(obj.friend);
-          break;
-        case "applyFriend":
-          console.log(
-            "你在其它端申请加了一个好友" + obj.account + ", 附言" + obj.ps
-          );
-          break;
-        case "passFriendApply":
-          console.log(
-            "你在其它端通过了一个好友申请" + obj.account + ", 附言" + obj.ps
-          );
-          onAddFriend(obj.friend);
-          break;
-        case "rejectFriendApply":
-          console.log(
-            "你在其它端拒绝了一个好友申请" + obj.account + ", 附言" + obj.ps
-          );
-          break;
-        case "deleteFriend":
-          console.log("你在其它端删了一个好友" + obj.account);
-          onDeleteFriend(obj.account);
-          break;
-        case "updateFriend":
-          console.log("你在其它端更新了一个好友", obj.friend);
-          onUpdateFriend(obj.friend);
-          break;
-      }
     },
     login() {
       console.log(nimConfig.appKey + "==>" + this.account + "==>" + MD5(this.pwd));
@@ -113,46 +82,57 @@ export default {
         token: MD5(this.pwd),
         db: false, //若不要开启数据库请设置false。SDK默认为true。
         // privateConf: {}, // 私有化部署方案所需的配置
-        onconnect: this.onConnect(),
+        onconnect: obj=>{
+          this.$store.commit("setNim", this.nim);
+          this.$cookies.set('isLogin',false)
+          console.log("Special way to show SDK connect!!!");
+          console.log(this.$store.state.nim)
+          console.log(this.$cookies.get('isLogin'))
+        },
         // 好友关系
-        onfriends: this.onFriends,
-        onmyinfo: this.onMyInfo,
-        onsyncfriendaction: this.onSyncFriendAction,
-        onwillreconnect: function(obj) {
+        onwillreconnect: obj=> {
           console.log("SDK即将重新连接");
         },
         ondisconnect: obj => {
-          //
           this.$store.commit("removeNim");
           console.log("SDK断开连接" + this.$store.state.nim);
+          this.$router.push('login');
         },
-        onerror: function(obj) {
-          console.log("SDK连接错误");
+        // onerror:this.onError(),
+        onerror:(error,obj)=>{
+          console.log("对不起我出错了"+error)
         },
-        onMyInfo(user) {
+        // 用户名片
+        onmyinfo:user=>{
           console.log("收到我的名片", user);
           this.$store.state.data.myInfo = user;
+        },
+        onfriends:friends=>{
+          console.log("收到好友列表", friends);
+          console.log(this.$store.state.nim);
+          this.$store.commit('setDate',{key:'friends',val:this.$store.state.nim.mergeFriends(this.$store.state.data.friends,friends)});
+          this.$store.commit('setDate',{key:'friends',val:this.$store.state.nim.cutFriends(this.$store.state.data.friends,friends.invalid)});
+          console.log(this.$store.state.data)
+        },
+        onsessions:sessions => {
+          console.log('收到会话列表', sessions);
+          this.$store.state.data.sessions = this.$store.state.nim.mergeSessions(this.$store.state.data.sessions, sessions);
+          //  将跳转放在所有流程执行完之后
+          if(this.$store.state.nim != null){
+            this.$router.push('index').catch(err => err)
+          }
         }
       });
       this.$store.commit("setNim", this.nim);
       console.log(this.$store.state.nim);
       console.log("===>");
       console.log(this.$store.state.data);
-      this.$router.push("/index");
     },
-    onFriends(friends) {
-      console.log("收到好友列表", friends);
-      console.log(this.nim);
-      this.$store.state.data.friends = this.nim.mergeFriends(this.data.friends,friends);
-      console.log(this.$store.state.data.friends);
-      this.data.friends = this.$store.state.nim.cutFriends(this.data.friends,friends.invalid);
-    }
   },
   mounted() {
   },
   beforeDestroy() {
     console.log("Before destroy....")
-    clearInterval(this.timer);
   }
 };
 </script>

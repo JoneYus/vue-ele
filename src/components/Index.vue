@@ -8,7 +8,7 @@
             <el-col :span="12">
               <div class="demo-basic--circle">
                 <div class="block">
-                  <el-avatar shape="circle" :size="50" fit="fill" :src="profile.url"></el-avatar>
+                  <el-avatar shape="circle" :size="50" fit="fill" :src="profile.avatar"></el-avatar>
                 </div>
               </div>
               <div class="sub-title" @click="logout">退出</div>
@@ -26,7 +26,7 @@
                   action="https://jsonplaceholder.typicode.com/posts/"
                   multiple
                 >
-                  <el-avatar shape="circle" :size="100" fit="fill" :src="profile.url"></el-avatar>
+                  <el-avatar shape="circle" :size="100" fit="fill" :src="profile.avatar"></el-avatar>
                   <div class="el-upload__text">
                     将文件拖到此处，或
                     <em>点击上传</em>
@@ -36,10 +36,10 @@
                 <!-- 用户信息修改 -->
                 <el-form :model="profile">
                   <el-form-item label="用户名称" :label-width="formProfileWidth">
-                    <el-input v-model="profile.name" autocomplete="off" placeholder="nicai"></el-input>
+                    <el-input v-model="profile.account" autocomplete="off" placeholder="nicai"></el-input>
                   </el-form-item>
                   <el-form-item label="用户昵称" :label-width="formProfileWidth">
-                    <el-input v-model="profile.nickname" autocomplete="off"></el-input>
+                    <el-input v-model="profile.nick" autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item label="个性签名" :label-width="formProfileWidth">
                     <el-input v-model="profile.sign" autocomplete="off"></el-input>
@@ -50,7 +50,7 @@
                   <el-button type="primary" @click="dialogProfileVisible = false">确 定</el-button>
                 </div>
               </el-dialog>
-              <div id="selfName">{{profile.name}}</div>
+              <div id="selfName">{{profile.account}}</div>
             </el-col>
           </el-row>
         </div>
@@ -63,7 +63,12 @@
             </span>
             <div class="listDetail">
               <ul class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
-                <li v-for="i in 10" :key="i" class="infinite-list-item">{{ i }}</li>
+                <li>
+                  <div  class="friendList" v-for="friend in this.$store.state.data.friends" :key="friend.id" @click="openHistoryChat(friend.id)">
+                    <div   class="friendAvator" :style="backgroundImg(friend.url)"></div>
+                    <div class="friendName">{{friend.account}}</div>
+                  </div>
+                </li>
               </ul>
             </div>
           </el-tab-pane>
@@ -88,23 +93,14 @@
                     </el-form>
                     <div slot="footer" class="dialog-footer">
                       <el-button @click="dialogFormVisible = false">取 消</el-button>
-                      <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                      <el-button type="primary" @click="AddFriend(form)">确 定</el-button>
                     </div>
                   </el-dialog>
                 </li>
                 <li>
-                  <div
-                    class="friendList"
-                    v-for="friend in friendList"
-                    :key="friend.id"
-                    @click="openChat(friend.id)"
-                  >
-                    <div
-                      class="friendAvator"
-                      :style="backgroundImg(friend.url)"
-                      style="background-image:url(++"
-                    ></div>
-                    <div class="friendName">{{friend.name}}</div>
+                  <div  class="friendList" v-for="friend in this.$store.state.data.friends" :key="friend.id" @click="openChat(friend.account)">
+                    <div   class="friendAvator" :style="backgroundImg(friend.url)"></div>
+                    <div class="friendName">{{friend.account}}</div>
                   </div>
                 </li>
               </ul>
@@ -113,7 +109,7 @@
         </el-tabs>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
+        <el-header>{{this.$store.state.data.myInfo}}</el-header>
         <el-main>Main</el-main>
         <el-footer>Footer</el-footer>
       </el-container>
@@ -124,44 +120,22 @@
 <script>
 export default {
   name: "Index",
-  props: {
-    msg: String
-  },
+  props: {},
   data() {
     return {
       circleUrl:
         "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       count: 0,
 
-      friendList: [
-        {
-          id: 1,
-          name: "张小三",
-          url:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-        },
-        {
-          id: 2,
-          name: "Jack swon",
-          url:
-            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-        },
-        {
-          id: 3,
-          name: "恋郭的小喵",
-          url:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-        }
-      ],
       dialogProfileVisible: false,
       formProfileWidth: "120px",
-      profile: {
-        name: "simple",
-        nickname: "抓泥鳅的阿牛哥",
-        sign: "就是这么有个性的个性签名",
-        url:
-          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-      },
+      // profile: {
+      //   account: "simple1",
+      //   nick: "simple",
+      //   sign: "就是这么有个性的个性签名",
+      //   avatar: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+      // },
+      profile:this.$store.state.data.myInfo,
       dialogFormVisible: false,
       form: {
         name: "",
@@ -174,13 +148,35 @@ export default {
       },
       formLabelWidth: "120px",
       timer:null,
+      friendList:null
     };
   },
   methods: {
+    AddFriend(account){
+      this.$store.state.nim.addFriend({
+        account: account,
+        ps: 'ps',
+        done: this.addFriendDone
+      });
+    },
+    addFriendDone(error, obj) {
+      console.log('直接加为好友' + (!error?'成功':'失败'), error, obj);
+      if (!error) {
+          this.onAddFriend(obj.friend);
+      }
+    },
+    onAddFriend(friend) {
+        this.$store.state.data.friends = this.$store.state.nim.mergeFriends(this.$store.state.data.friends, friend);
+        // refreshFriendsUI();
+    },
+    openHistoryChat(index){
+      alert("打开与"+index+"的历史聊天记录")
+    },
     openChat(index){
       alert("打开聊天页面"+index)
     },
     backgroundImg(url) {
+      url= url==null?this.circleUrl:url
       return "background-image:url(" + url + ");background-size: contain;";
     },
     editProfile() {
@@ -192,7 +188,7 @@ export default {
       alert("退出登录成功");
       console.log(this.$store.state.nim);
 
-      this.$router.push("login");
+      this.$router.push("login").catch(err => err);
     },
     load(){
       return this.count+=2
@@ -212,23 +208,27 @@ export default {
       console.log('获取用户资料数组' + (!error?'成功':'失败'));
     }
   },
-  mounted() {
-    this.timer=setInterval(this.heartBeatTest, 2000);
+  watch(){
+    profile:this.$store.commit('getDate','myInfo')
+    friendList:this.$store.commit('getDate','friends')
+  },
+  computed:{
+    myPofile:function(){
+      return  this.$store.state.data.myInfo
+    }
+  },
+  beforeCreate() {
+  },
+  created() {
+    this.friendList = this.$store.state.data.friends
+  },
+  mounted(){
+    // this.timer=setInterval(this.heartBeatTest, 2000);
     console.log(this.$store.state.data)
     this.checkNim();
-    var friList = this.$store.state.data.friends;
-    var accounts = []
-    for(var i = 1;i<friList.size;i++){
-      accounts.append(friList[i].account)
-    }
-    this.$store.state.nim.getUsers({
-      accounts:accounts,
-      done: this.getUsersDone
-    });
   },
   beforeDestroy(){
-    clearInterval(this.timer)
-    console.log("Clear interval")
+    // clearInterval(this.timer)
   }
 };
 </script>
@@ -245,7 +245,7 @@ export default {
   width: 50px;
   border-radius: 50%;
   margin: 5px 0 5px 5px;
-  background-color: blue;
+  background-color: papayawhip;
 }
 .friendList {
   height: 60px;

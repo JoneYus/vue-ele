@@ -11,8 +11,11 @@ const mutations = {
         console.log("initMD5 has been execute")
         state.MD5 = MD5
     },
-    setDate(state){
-        this.data =  123
+    setDate(state,params){
+        state.data[params.key] = params.val
+    },
+    getDate(state,key){
+        return state.data[key]
     },
     removeDate(state){
         state.data = null
